@@ -1,2 +1,3 @@
-package br.ufsm.csi.pilacoin.model;public class Transacoes {
+package br.ufsm.csi.pilacoin.model;
+public class Transacoes {
 }

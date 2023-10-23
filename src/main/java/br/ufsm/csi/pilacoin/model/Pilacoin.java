@@ -34,27 +34,4 @@ public class Pilacoin implements Serializable {
     private byte[] magicNumber;
     public static BigInteger dificuldade;
     public enum StatusPila {AG_VALIDACAO, AG_BLOCO, BLOCO_EM_VALIDACAO, VALIDO, INVALIDO}
-
-    @SneakyThrows
-    @RabbitListener(queues = "dificuldade")
-    public void getDificuldade(@Payload String sla){
-        ObjectMapper objectMapper = new ObjectMapper();
-        Difficulty diff = objectMapper.readValue(sla, Difficulty.class);
-        dificuldade = new BigInteger(diff.getDificuldade(), 16).abs();
-    }
-
-    @RabbitListener(queues = "pila-validado")
-    public void getValidos(@Payload String valido){
-        System.out.println("Pila valido: "+valido);
-    }
-
-    @RabbitListener(queues = "clients-errors")
-    public void getErrors(@Payload String valido){
-        System.out.println("clients-errors: "+valido);
-    }
-
-    @RabbitListener(queues = "clients-msgs")
-    public void getMsgs(@Payload String valido){
-        System.out.println("clients-msgs: "+valido);
-    }
 }

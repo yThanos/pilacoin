@@ -1,6 +1,7 @@
-package br.ufsm.csi.pilacoin.model;
+package br.ufsm.csi.pilacoin.service;
 
-import br.ufsm.csi.pilacoin.PilaCoinJson;
+import br.ufsm.csi.pilacoin.Pilacoin;
+import br.ufsm.csi.pilacoin.model.PilaCoinJson;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import jakarta.annotation.PostConstruct;
