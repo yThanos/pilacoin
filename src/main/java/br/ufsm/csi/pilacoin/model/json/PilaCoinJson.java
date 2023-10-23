@@ -1,6 +1,6 @@
-package br.ufsm.csi.pilacoin.model;
+package br.ufsm.csi.pilacoin.model.json;
 
-import br.ufsm.csi.pilacoin.Pilacoin;
+import br.ufsm.csi.pilacoin.model.Pilacoin;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;

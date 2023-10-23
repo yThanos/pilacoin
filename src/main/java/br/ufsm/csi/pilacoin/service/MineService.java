@@ -1,9 +1,8 @@
 package br.ufsm.csi.pilacoin.service;
 
-import br.ufsm.csi.pilacoin.Pilacoin;
-import br.ufsm.csi.pilacoin.model.PilaCoinJson;
+import br.ufsm.csi.pilacoin.model.Pilacoin;
+import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -19,7 +18,7 @@ import java.util.Date;
 import java.util.Random;
 
 @Service
-public class PilaService {
+public class MineService {
     @Autowired
     RabbitTemplate rabbitTemplate;
 
@@ -32,7 +31,7 @@ public class PilaService {
                 KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
                 kpg.initialize(1040);
                 KeyPair kp = kpg.genKeyPair();
-                byte[] pubkey = kp.getPublic().getEncoded();
+                Pilacoin.chavePublica = kp.getPublic().getEncoded();
                 BigInteger hash;
                 MessageDigest md;
                 md = MessageDigest.getInstance("SHA-256");
@@ -43,15 +42,15 @@ public class PilaService {
                     Random rnd = new Random();
                     byte[] bytes = new byte[256/8];
                     rnd.nextBytes(bytes);
-                    ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-                    PilaCoinJson pj = PilaCoinJson.builder().chaveCriador(pubkey).nomeCriador("Vitor Fraporti").
-                            dataCriacao(new Date()).nonce(new BigInteger(bytes).abs().toString()).build();
-                    hash = new BigInteger(md.digest(ow.writeValueAsString(pj).getBytes(StandardCharsets.UTF_8)));
-                    hash = hash.abs();
+                    ObjectMapper ow = new ObjectMapper();
+                    String nonce = new BigInteger(bytes).abs().toString();
+                    PilaCoinJson pj = PilaCoinJson.builder().chaveCriador(Pilacoin.chavePublica).nomeCriador("Vitor Fraporti").
+                            dataCriacao(new Date()).nonce(nonce).build();
+                    hash = new BigInteger(md.digest(ow.writeValueAsString(pj).getBytes(StandardCharsets.UTF_8))).abs();
                     if (hash.compareTo(Pilacoin.dificuldade) < 0){
-                        System.out.println(tentativa);
-                        System.out.println(hash);
-                        System.out.println(Pilacoin.dificuldade);
+                        System.out.println(tentativa+" tentativas");
+                        System.out.println("Hash: "+hash);
+                        System.out.println("Diff: "+Pilacoin.dificuldade);
                         System.out.println(ow.writeValueAsString(pj));
                         rabbitTemplate.convertAndSend("pila-minerado", ow.writeValueAsString(pj));
                         tentativa = 0;

@@ -1,5 +1,6 @@
-package br.ufsm.csi.pilacoin.model;
+package br.ufsm.csi.pilacoin.model.json;
 
+import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,6 @@ public class ValidacaoPilaJson {
     private String nomeValidador;
     private byte[] chavePublicaValidador;
     private byte[] assinaturaPilaCoin;
-    private PilaCoinJson pilaCoin;
+    private String pilaCoinJson;
 
 }
