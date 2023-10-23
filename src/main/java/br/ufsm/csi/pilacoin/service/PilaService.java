@@ -1,8 +1,6 @@
 package br.ufsm.csi.pilacoin.model;
 
 import br.ufsm.csi.pilacoin.PilaCoinJson;
-import br.ufsm.csi.pilacoin.Pilacoin;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import jakarta.annotation.PostConstruct;
@@ -46,8 +44,7 @@ public class PilaService {
                     rnd.nextBytes(bytes);
                     ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
                     PilaCoinJson pj = PilaCoinJson.builder().chaveCriador(pubkey).nomeCriador("Vitor Fraporti").
-                            dataCriacao(new Date()).nonce(new BigInteger(bytes).abs().toString()).
-                            status(Pilacoin.StatusPila.AG_VALIDACAO).build();
+                            dataCriacao(new Date()).nonce(new BigInteger(bytes).abs().toString()).build();
                     hash = new BigInteger(md.digest(ow.writeValueAsString(pj).getBytes(StandardCharsets.UTF_8)));
                     hash = hash.abs();
                     if (hash.compareTo(Pilacoin.dificuldade) < 0){

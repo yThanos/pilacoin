@@ -45,7 +45,7 @@ public class Pilacoin implements Serializable {
 
     @RabbitListener(queues = "pila-validado")
     public void getValidos(@Payload String valido){
-        System.out.println(valido);
+        System.out.println("Pila valido: "+valido);
     }
 
     @RabbitListener(queues = "clients-errors")
