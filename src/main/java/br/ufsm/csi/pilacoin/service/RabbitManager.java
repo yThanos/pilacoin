@@ -47,6 +47,7 @@ public class RabbitManager {
                 ValidacaoPilaJson validacaoPilaJson = ValidacaoPilaJson.builder().pilaCoinJson(ob.writeValueAsString(pilaJson)).
                         assinaturaPilaCoin(vpj.getAssinaturaPilaCoin()).nomeValidador("Vitor Fraporti").
                         chavePublicaValidador(Pilacoin.chavePublica).build();
+
                 rabbitTemplate.convertAndSend("pila-validado", ob.writeValueAsString(validacaoPilaJson));
             }
         }
