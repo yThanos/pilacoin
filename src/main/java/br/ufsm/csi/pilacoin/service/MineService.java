@@ -19,8 +19,12 @@ import java.util.Random;
 
 @Service
 public class MineService {
+    private final RabbitTemplate rabbitTemplate;
+
     @Autowired
-    RabbitTemplate rabbitTemplate;
+    public MineService(RabbitTemplate rbt){
+        this.rabbitTemplate = rbt;
+    }
 
     @PostConstruct
     void mineService() {
@@ -32,6 +36,7 @@ public class MineService {
                 kpg.initialize(1040);
                 KeyPair kp = kpg.genKeyPair();
                 Pilacoin.chavePublica = kp.getPublic().getEncoded();
+                RabbitManager.privateKey = kp.getPrivate();
                 BigInteger hash;
                 MessageDigest md;
                 md = MessageDigest.getInstance("SHA-256");
@@ -52,7 +57,9 @@ public class MineService {
                         System.out.println("Hash: "+hash);
                         System.out.println("Diff: "+Pilacoin.dificuldade);
                         System.out.println(ow.writeValueAsString(pj));
+                        long inicio = System.currentTimeMillis();
                         rabbitTemplate.convertAndSend("pila-minerado", ow.writeValueAsString(pj));
+                        System.out.println(System.currentTimeMillis() - inicio);
                         tentativa = 0;
                     }
                 } while (true);
