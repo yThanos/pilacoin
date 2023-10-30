@@ -40,10 +40,6 @@ public class RabbitManager {
         Pilacoin.dificuldade = new BigInteger(diff.getDificuldade(), 16).abs();
     }
 
-    @RabbitListener(queues = "pila-validado")
-    public void getValidos(@Payload String valido){
-        System.out.println("Pila validado: "+valido);
-    }
 
     @SneakyThrows
     @RabbitListener(queues = "pila-minerado")
@@ -73,9 +69,10 @@ public class RabbitManager {
                 if(hash.compareTo(Pilacoin.dificuldade) < 0){
                     System.out.println("Passou na dificuldade");
                     md.reset();//reseta o MessageDigest para usar dnv
+                    byte[] hashh = md.digest(pilaStr.getBytes(StandardCharsets.UTF_8));
                     Cipher cipher = Cipher.getInstance("RSA");
                     cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-                    String hashStr = ob.writeValueAsString(hash);
+                    String hashStr = ob.writeValueAsString(hashh);
                     System.out.println("Passou do chipher");
                     byte[] assinatura = md.digest(hashStr.getBytes(StandardCharsets.UTF_8));//assinatura
                     ValidacaoPilaJson validacaoPilaJson = ValidacaoPilaJson.builder().pilaCoinJson(pilaJson).
