@@ -47,6 +47,7 @@ public class RabbitManager {
         }
         pilaIgnroe.add(pilaStr);
         if (fim){
+            System.out.println("-=+=-=+=-=+=".repeat(4));
             ObjectMapper ob = new ObjectMapper();
             PilaCoinJson pilaJson = ob.readValue(pilaStr, PilaCoinJson.class);
             if(pilaJson.getNomeCriador().equals("Vitor Fraporti")){
@@ -68,6 +69,7 @@ public class RabbitManager {
                     rabbitTemplate.convertAndSend("pila-minerado", pilaStr);
                 }
             }
+            System.out.println("-=+=-=+=-=+=".repeat(4));
         }
     }
 

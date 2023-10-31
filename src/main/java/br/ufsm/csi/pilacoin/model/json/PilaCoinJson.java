@@ -1,6 +1,5 @@
 package br.ufsm.csi.pilacoin.model.json;
 
-import br.ufsm.csi.pilacoin.model.Pilacoin;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
@@ -21,7 +20,6 @@ public class PilaCoinJson implements Cloneable{
     private Date dataCriacao;
     private byte[] chaveCriador;
     private String nomeCriador;
-    private Pilacoin.StatusPila status;
     private String nonce;
 
     @Override

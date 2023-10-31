@@ -1,9 +1,7 @@
 package br.ufsm.csi.pilacoin.service;
 
-import br.ufsm.csi.pilacoin.model.Pilacoin;
 import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
 import br.ufsm.csi.pilacoin.util.PilaUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
@@ -52,7 +50,8 @@ public class MineService {
                         rnd.nextBytes(bytes);
                         ObjectMapper ow = new ObjectMapper();
                         String nonce = new BigInteger(bytes).abs().toString();
-                        PilaCoinJson pj = PilaCoinJson.builder().chaveCriador(PilaUtil.publicKey.toString().getBytes()).nomeCriador("Vitor Fraporti").
+                        PilaCoinJson pj = PilaCoinJson.builder().chaveCriador(PilaUtil.publicKey.toString().getBytes()).
+                                nomeCriador("Vitor Fraporti").
                                 dataCriacao(new Date()).nonce(nonce).build();
                         hash = new BigInteger(md.digest(ow.writeValueAsString(pj).getBytes(StandardCharsets.UTF_8))).abs();
                         if (hash.compareTo(PilaUtil.difficulty) < 0){
