@@ -2,7 +2,6 @@ package br.ufsm.csi.pilacoin.service;
 
 import br.ufsm.csi.pilacoin.model.PilaCoinJson;
 import br.ufsm.csi.pilacoin.util.Constants;
-import br.ufsm.csi.pilacoin.util.PilaUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
@@ -10,10 +9,12 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -30,9 +31,13 @@ public class MineService {
 
     @PostConstruct
     void mineService() throws NoSuchAlgorithmException {
-        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-        kpg.initialize(1040);
-        KeyPair kp = kpg.genKeyPair();
+        KeyPair kp;
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("keypair.ser"))) {
+            kp = (KeyPair) inputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Erro carregando as chaves");
+            return;
+        }
         Constants.PUBLIC_KEY = kp.getPublic();
         Constants.PRIVATE_KEY = kp.getPrivate();
         for(int i = 0; i<Runtime.getRuntime().availableProcessors(); i++){

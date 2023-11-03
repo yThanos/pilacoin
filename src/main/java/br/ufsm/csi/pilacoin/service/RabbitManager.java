@@ -98,6 +98,8 @@ public class RabbitManager {
         System.out.println(blocoJson);
         ObjectMapper om = new ObjectMapper();
         BlocoJson bloco = om.readValue(blocoJson, BlocoJson.class);
+        String nonceAnterior = (bloco.getNonce() != null)?bloco.getNonce():"nulo";
+        System.out.println("Nonce anterior: "+ nonceAnterior);
         BigInteger hash;
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         bloco.setChaveUsuarioMinerador(Constants.PUBLIC_KEY.toString().getBytes());
