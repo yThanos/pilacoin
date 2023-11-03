@@ -1,6 +1,7 @@
 package br.ufsm.csi.pilacoin.service;
 
-import br.ufsm.csi.pilacoin.model.json.PilaCoinJson;
+import br.ufsm.csi.pilacoin.model.PilaCoinJson;
+import br.ufsm.csi.pilacoin.util.Constants;
 import br.ufsm.csi.pilacoin.util.PilaUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -32,8 +33,8 @@ public class MineService {
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
         kpg.initialize(1040);
         KeyPair kp = kpg.genKeyPair();
-        PilaUtil.publicKey = kp.getPublic();
-        PilaUtil.privateKey = kp.getPrivate();
+        Constants.PUBLIC_KEY = kp.getPublic();
+        Constants.PRIVATE_KEY = kp.getPrivate();
         for(int i = 0; i<Runtime.getRuntime().availableProcessors(); i++){
             Thread t = new Thread(new Runnable() {
                 @SneakyThrows
@@ -50,11 +51,11 @@ public class MineService {
                         rnd.nextBytes(bytes);
                         ObjectMapper ow = new ObjectMapper();
                         String nonce = new BigInteger(bytes).abs().toString();
-                        PilaCoinJson pj = PilaCoinJson.builder().chaveCriador(PilaUtil.publicKey.toString().getBytes()).
+                        PilaCoinJson pj = PilaCoinJson.builder().chaveCriador(Constants.PUBLIC_KEY.toString().getBytes()).
                                 nomeCriador("Vitor Fraporti").
                                 dataCriacao(new Date()).nonce(nonce).build();
                         hash = new BigInteger(md.digest(ow.writeValueAsString(pj).getBytes(StandardCharsets.UTF_8))).abs();
-                        if (hash.compareTo(PilaUtil.difficulty) < 0){
+                        if (hash.compareTo(Constants.DIFFICULTY) < 0){
                             System.out.println("-=+=-=+=-=+=".repeat(4));
                             System.out.println(tentativa+" tentativas on "+Thread.currentThread().getName());
                             System.out.println("-=+=-=+=-=+=".repeat(4));

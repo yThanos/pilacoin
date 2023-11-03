@@ -1,4 +1,4 @@
-package br.ufsm.csi.pilacoin.model.json;
+package br.ufsm.csi.pilacoin.model;
 
 import lombok.Builder;
 import lombok.Data;

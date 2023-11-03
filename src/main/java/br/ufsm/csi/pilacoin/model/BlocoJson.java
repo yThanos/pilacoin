@@ -1,5 +1,6 @@
 package br.ufsm.csi.pilacoin.model;
 
+import br.ufsm.csi.pilacoin.model.Transacoes;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
@@ -7,8 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -16,11 +17,10 @@ import java.util.Date;
 @AllArgsConstructor
 @JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Transacoes {
-    private byte[] chaveUsuarioOrigem;
-    private byte[] chaveUsuarioDestino;
-    private byte[] assinatura;
-    private String noncePila;
-    private Date dataTransacao;
-    private Long id;
+public class BlocoJson {
+    private int numeroBloco;
+    private String nonceBlocoAnterior;
+    private String nonce;
+    private byte[] chaveUsuarioMinerador;
+    private List<Transacoes> transacoes;
 }
