@@ -15,19 +15,11 @@ import java.util.Date;
 @NoArgsConstructor
 @JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PilaCoinJson implements Cloneable{
+public class PilaCoinJson {
     private Long id;
     private Date dataCriacao;
     private byte[] chaveCriador;
     private String nomeCriador;
     private String nonce;
 
-    @Override
-    public PilaCoinJson clone() {
-        try {
-            return (PilaCoinJson) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
-    }
 }

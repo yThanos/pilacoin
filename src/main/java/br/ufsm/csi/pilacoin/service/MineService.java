@@ -2,6 +2,7 @@ package br.ufsm.csi.pilacoin.service;
 
 import br.ufsm.csi.pilacoin.model.PilaCoinJson;
 import br.ufsm.csi.pilacoin.util.Constants;
+import br.ufsm.csi.pilacoin.util.PilaUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
@@ -16,9 +17,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import java.util.Random;
 
 @Service
 public class MineService {
@@ -30,7 +29,7 @@ public class MineService {
     }
 
     @PostConstruct
-    void mineService() throws NoSuchAlgorithmException {
+    void mineService() {
         KeyPair kp;
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("keypair.ser"))) {
             kp = (KeyPair) inputStream.readObject();
@@ -51,14 +50,10 @@ public class MineService {
                     int tentativa = 0;
                     while (true){
                         tentativa++;
-                        Random rnd = new Random();
-                        byte[] bytes = new byte[256/8];
-                        rnd.nextBytes(bytes);
                         ObjectMapper ow = new ObjectMapper();
-                        String nonce = new BigInteger(bytes).abs().toString();
                         PilaCoinJson pj = PilaCoinJson.builder().chaveCriador(Constants.PUBLIC_KEY.toString().getBytes()).
                                 nomeCriador("Vitor Fraporti").
-                                dataCriacao(new Date()).nonce(nonce).build();
+                                dataCriacao(new Date()).nonce(new PilaUtil().geraNonce()).build();
                         hash = new BigInteger(md.digest(ow.writeValueAsString(pj).getBytes(StandardCharsets.UTF_8))).abs();
                         if (hash.compareTo(Constants.DIFFICULTY) < 0){
                             System.out.println("-=+=-=+=-=+=".repeat(4));
@@ -71,7 +66,7 @@ public class MineService {
                 }
             });
             t.setName("Thread_"+i);
-            t.start();
+            //t.start();
         }
     }
 }

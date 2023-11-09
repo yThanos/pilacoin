@@ -7,14 +7,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
+import java.util.Date;
+
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Difficulty {
-    private String dificuldade;
-    private long inicio;
-    private long validadeFinal;
+public class TransferirPila {
+    private byte[] chaveUsuarioOrigem;
+    private byte[] chaveUsuarioDestino;
+    private String nomeUsuarioOrigem;
+    private String nomeUsuarioDestino;
+    private byte[] assinatura;
+    private String noncePila;
+    private Date dataTransacao;
+    private Long id;
+    private String status;
 }

@@ -1,6 +1,5 @@
 package br.ufsm.csi.pilacoin.model;
 
-import br.ufsm.csi.pilacoin.model.Transacoes;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
@@ -8,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -21,6 +19,7 @@ public class BlocoJson {
     private int numeroBloco;
     private String nonceBlocoAnterior;
     private String nonce;
+    private String nomeUsuarioMinerador;
     private byte[] chaveUsuarioMinerador;
     private List<Transacoes> transacoes;
 }
