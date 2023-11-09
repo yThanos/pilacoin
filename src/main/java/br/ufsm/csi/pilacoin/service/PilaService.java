@@ -6,8 +6,6 @@ import br.ufsm.csi.pilacoin.util.PilaUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -20,14 +18,7 @@ import java.security.MessageDigest;
 import java.util.Date;
 
 @Service
-public class MineService {
-    private final RabbitTemplate rabbitTemplate;
-
-    @Autowired
-    public MineService(RabbitTemplate rbt){
-        this.rabbitTemplate = rbt;
-    }
-
+public class PilaService {
     @PostConstruct
     void mineService() {
         KeyPair kp;
@@ -59,7 +50,7 @@ public class MineService {
                             System.out.println("-=+=-=+=-=+=".repeat(4));
                             System.out.println(tentativa+" tentativas on "+Thread.currentThread().getName());
                             System.out.println("-=+=-=+=-=+=".repeat(4));
-                            rabbitTemplate.convertAndSend("pila-minerado", ow.writeValueAsString(pj));
+                            new RabbitManager().pilaMinerado(pj);
                             tentativa = 0;
                         }
                     }

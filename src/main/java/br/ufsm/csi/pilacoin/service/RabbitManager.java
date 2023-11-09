@@ -19,12 +19,9 @@ import java.util.ArrayList;
 
 @Service
 public class RabbitManager {
-    @Autowired
-    public RabbitManager(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
-    }
 
-    private final RabbitTemplate rabbitTemplate;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
     private static final ArrayList<String> pilaIgnroe = new ArrayList<>();
     public static ArrayList<MsgsJson> mensagens = new ArrayList<>();
 
@@ -35,7 +32,6 @@ public class RabbitManager {
         Difficulty diff = objectMapper.readValue(sla, Difficulty.class);
         Constants.DIFFICULTY = new BigInteger(diff.getDificuldade(), 16).abs();
     }
-
 
     @RabbitListener(queues = "pila-minerado")
     public void getMinerados(@Payload String pilaStr) throws NoSuchAlgorithmException {
@@ -99,72 +95,27 @@ public class RabbitManager {
 
     @RabbitListener(queues = "descobre-bloco")
     public void descobreBloco(@Payload String blocoJson) throws JsonProcessingException, NoSuchAlgorithmException {
-        System.out.println("Descobriu um bloco!");
-        ObjectMapper om = new ObjectMapper();
-        BlocoJson bloco = om.readValue(blocoJson, BlocoJson.class);
-        String nonceAnterior = (bloco.getNonce() != null)?bloco.getNonce():"nulo";
-        System.out.println("Nonce anterior: "+ nonceAnterior);
-        BigInteger hash;
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        bloco.setNomeUsuarioMinerador(Constants.USERNAME);
-        bloco.setChaveUsuarioMinerador(Constants.PUBLIC_KEY.toString().getBytes());
-        boolean loop = true;
-        while(loop){
-            bloco.setNonce(new PilaUtil().geraNonce());
-            hash = new BigInteger(md.digest(om.writeValueAsString(bloco).getBytes(StandardCharsets.UTF_8))).abs();
-            if (hash.compareTo(Constants.DIFFICULTY) < 0){
-                BigInteger validacao = new BigInteger(md.digest(om.writeValueAsString(bloco).getBytes(StandardCharsets.UTF_8))).abs();
-                System.out.println("==============".repeat(4));
-                System.out.println(validacao);
-                System.out.println(Constants.DIFFICULTY);
-                rabbitTemplate.convertAndSend("bloco-minerado", om.writeValueAsString(bloco));
-                System.out.println(hash);
-                loop = false;
-            }
-        }
-        MsgsJson msg = MsgsJson.builder().msg("Bloco descoberto e minerado!").
-                lida(false).nomeUsuario(Constants.USERNAME).queue("Decobre bloco").build();
-        mensagens.add(msg);
-        System.out.println("bloco minerado!");
-        System.out.println(om.writeValueAsString(bloco));
+        blocoMinerado(new BlocoService().mineraBloco(blocoJson));
+    }
 
+    public void blocoMinerado(String bloco){
+        rabbitTemplate.convertAndSend("bloco-minerado", bloco);
     }
 
     @RabbitListener(queues = "bloco-minerado")
     public void validaBloco(@Payload String blocoJson) throws NoSuchAlgorithmException {
-        System.out.println("XXXXXXXXXX".repeat(4));
-        System.out.println("Validando bloco!");
-        ObjectMapper om = new ObjectMapper();
-        BlocoJson bloco;
-        try {
-            bloco = om.readValue(blocoJson, BlocoJson.class);
-        } catch (JsonProcessingException e) {
-            rabbitTemplate.convertAndSend("bloco-minerado", blocoJson);
-            System.out.println("Erro conversão");
-            return;
-        }
+        new BlocoService().validaBloco(blocoJson);
+    }
 
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        BigInteger hash = new BigInteger(md.digest(blocoJson.getBytes(StandardCharsets.UTF_8))).abs();
-        System.out.println(hash);
-        System.out.println(Constants.DIFFICULTY);
-        if(hash.compareTo(Constants.DIFFICULTY) < 0){
-            ValidaBlocoJson vbj = ValidaBlocoJson.builder().
-                    assinaturaBloco(new PilaUtil().getAssinatura(blocoJson)).bloco(bloco).
-                    chavePublicaValidador(Constants.PUBLIC_KEY.toString().getBytes()).
-                    nomeValidador(Constants.USERNAME).build();
-            try {
-                rabbitTemplate.convertAndSend("bloco-validado", om.writeValueAsString(vbj));
-                System.out.println("Valido! :)");
-            } catch (JsonProcessingException e) {
-                rabbitTemplate.convertAndSend("bloco-minerado", blocoJson);
-                System.out.println("Erro conversão");
-                return;
-            }
-        } else {
-            rabbitTemplate.convertAndSend("bloco-minerado", blocoJson);
-            System.out.println("Não validou :(");
-        }
-        System.out.println("XXXXXXXXXX".repeat(4));
+    public void blocoValidado(String blocoJson){
+        rabbitTemplate.convertAndSend("bloco-validado", blocoJson);
+    }
+
+    public void tranferirPila(TransferirPila tp){
+        rabbitTemplate.convertAndSend("tranferir-pila", tp);
+    }
+
+    public void pilaMinerado(PilaCoinJson pj){
+        rabbitTemplate.convertAndSend("pila-minerado",pj);
     }
 }
