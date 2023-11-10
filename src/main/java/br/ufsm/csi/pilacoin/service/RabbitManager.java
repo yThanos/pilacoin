@@ -2,7 +2,6 @@ package br.ufsm.csi.pilacoin.service;
 
 import br.ufsm.csi.pilacoin.model.*;
 import br.ufsm.csi.pilacoin.util.Constants;
-import br.ufsm.csi.pilacoin.util.PilaUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -12,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
@@ -44,41 +41,7 @@ public class RabbitManager {
         }
         pilaIgnroe.add(pilaStr);
         if (fim){
-            System.out.println("-=+=-=+=-=+=".repeat(4));
-            ObjectMapper ob = new ObjectMapper();
-            PilaCoinJson pilaJson = null;
-            try {
-                pilaJson = ob.readValue(pilaStr, PilaCoinJson.class);
-            } catch (JsonProcessingException e) {
-                rabbitTemplate.convertAndSend("pila-minerado", pilaStr);
-                return;
-            }
-            if(pilaJson.getNomeCriador().equals("Vitor Fraporti")){
-                rabbitTemplate.convertAndSend("pila-minerado",pilaStr);//devolve pq n é meu
-                System.out.println("Ignora é meu!");
-            } else {
-                System.out.println("Validando pila do(a): "+pilaJson.getNomeCriador());
-                MessageDigest md = MessageDigest.getInstance("SHA-256");
-                BigInteger hash = new BigInteger(md.digest(pilaStr.getBytes(StandardCharsets.UTF_8))).abs();
-                if(hash.compareTo(Constants.DIFFICULTY) < 0){
-                    ValidacaoPilaJson validacaoPilaJson = ValidacaoPilaJson.builder().
-                            pilaCoinJson(pilaJson).
-                            assinaturaPilaCoin(new PilaUtil().getAssinatura(pilaStr)).
-                            nomeValidador("Vitor Fraporti").
-                            chavePublicaValidador(Constants.PUBLIC_KEY.toString().getBytes()).build();
-                    try {
-                        rabbitTemplate.convertAndSend("pila-validado", ob.writeValueAsString(validacaoPilaJson));
-                        System.out.println("Valido! :)");
-                    } catch (JsonProcessingException e) {
-                        rabbitTemplate.convertAndSend("pila-minerado", pilaStr);
-                        return;
-                    }
-                } else {
-                    System.out.println("Não Validou! :(");
-                    rabbitTemplate.convertAndSend("pila-minerado", pilaStr);
-                }
-            }
-            System.out.println("-=+=-=+=-=+=".repeat(4));
+            new PilaService().validaPila(pilaStr);
         }
     }
 
@@ -98,13 +61,13 @@ public class RabbitManager {
         blocoMinerado(new BlocoService().mineraBloco(blocoJson));
     }
 
-    public void blocoMinerado(String bloco){
-        rabbitTemplate.convertAndSend("bloco-minerado", bloco);
-    }
-
     @RabbitListener(queues = "bloco-minerado")
     public void validaBloco(@Payload String blocoJson) throws NoSuchAlgorithmException {
         new BlocoService().validaBloco(blocoJson);
+    }
+
+    public void blocoMinerado(String bloco){
+        rabbitTemplate.convertAndSend("bloco-minerado", bloco);
     }
 
     public void blocoValidado(String blocoJson){
@@ -115,7 +78,11 @@ public class RabbitManager {
         rabbitTemplate.convertAndSend("tranferir-pila", tp);
     }
 
-    public void pilaMinerado(PilaCoinJson pj){
+    public void pilaMinerado(String pj){
         rabbitTemplate.convertAndSend("pila-minerado",pj);
+    }
+
+    public void pilaValido(String pila){
+        rabbitTemplate.convertAndSend("pila-validado", pila);
     }
 }
