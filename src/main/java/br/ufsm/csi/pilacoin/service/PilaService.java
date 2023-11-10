@@ -1,6 +1,7 @@
 package br.ufsm.csi.pilacoin.service;
 
 import br.ufsm.csi.pilacoin.model.PilaCoinJson;
+import br.ufsm.csi.pilacoin.model.Usuario;
 import br.ufsm.csi.pilacoin.model.ValidacaoPilaJson;
 import br.ufsm.csi.pilacoin.util.Constants;
 import br.ufsm.csi.pilacoin.util.PilaUtil;

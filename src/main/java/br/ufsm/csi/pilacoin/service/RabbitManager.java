@@ -32,15 +32,15 @@ public class RabbitManager {
 
     @RabbitListener(queues = "pila-minerado")
     public void getMinerados(@Payload String pilaStr) throws NoSuchAlgorithmException {
-        boolean fim = true;
+        boolean novo = true;
         for(String pila: pilaIgnroe){
             if (pila.equals(pilaStr)){
-                fim = false;
+                novo = false;
                 break;
             }
         }
         pilaIgnroe.add(pilaStr);
-        if (fim){
+        if (novo){
             new PilaService().validaPila(pilaStr);
         }
     }
